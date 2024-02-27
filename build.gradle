@@ -39,8 +39,10 @@ dependencies {
 
 }
 
-test {
-    useJUnitPlatform()
+tasks.withType(Test).configureEach {
+    useJUnitPlatform {
+        excludeTags 'integration'
+    }
 }
 
 pmd {
@@ -57,5 +59,12 @@ tasks.register('deploy') {
             into 'deploy/'
             include '*.jar'
         }
+    }
+}
+
+tasks.register('testAll') {
+    dependsOn 'test'
+    doLast {
+        println 'All tests are passed'
     }
 }

@@ -5,12 +5,10 @@ import lombok.*;
 
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @NoArgsConstructor
-@AllArgsConstructor
-@Getter
-@Setter
-@Builder
+@Data
 public class GlutenfreiesRezept extends Rezept{
 
     private boolean glutenfrei;

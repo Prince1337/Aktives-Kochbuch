@@ -8,7 +8,7 @@ public enum Type {
             case "VEGETARISCH" -> VEGETARISCH;
             case "GLUTENFREI" -> GLUTENFREI;
             case "STANDARD" -> STANDARD;
-            default -> throw new IllegalArgumentException("Ungültiger Rezepttyp: " + type);
+            default -> throw new IllegalArgumentException("Ungültiger Rezept Typ: " + type);
         };
     }
 }
