@@ -19,8 +19,14 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
 class RezeptServiceTests {
 
+    public static final String SOME_TITLE = "someTitle";
+    public static final String SOME_REZEPTUR = "someRezeptur";
+    public static final String SOME_TAGS = "someTags";
+    public static final String STATUS_CODE_SHOULD_BE_404 = "Status code should be 404";
+    public static final String STATUS_CODE_SHOULD_BE_200 = "Status code should be 200";
     @Mock
     private RezeptRepository rezeptRepository;
 
@@ -28,119 +34,108 @@ class RezeptServiceTests {
     private RezeptService rezeptService;
 
     @Test
-    public void testCreateRezept() {
-        Rezept rezept = new Rezept(1L, "someTitle", "someRezeptur", List.of("someTags"));
+    void testCreateRezept() {
+        Rezept rezept = new Rezept(1L, SOME_TITLE, SOME_REZEPTUR, List.of(SOME_TAGS));
         when(rezeptRepository.save(rezept)).thenReturn(rezept);
 
         ResponseEntity<HttpResponse> responseEntity = rezeptService.createRezept(rezept);
 
-                assertEquals(HttpStatus.OK, Objects.requireNonNull(responseEntity.getBody()).getStatus());
-                assertEquals("Rezept erfolgreich erstellt", Objects.requireNonNull(responseEntity.getBody()).getMessage());
-                assertEquals(rezept, Objects.requireNonNull(responseEntity.getBody()).getData().get("rezept"));
-                assertEquals(1, Objects.requireNonNull(responseEntity.getBody()).getData().size());
-                assertEquals(200, Objects.requireNonNull(responseEntity.getBody()).getStatusCode());
-                assertNotNull(Objects.requireNonNull(responseEntity.getBody()).getTimeStamp());
-                assertEquals("Rezept erfolgreich zur Datenbank hinzugefügt", Objects.requireNonNull(responseEntity.getBody()).getDeveloperMessage());
+                assertEquals(HttpStatus.OK, Objects.requireNonNull(responseEntity.getBody()).getStatus(), STATUS_CODE_SHOULD_BE_200);
+                assertEquals("Rezept erfolgreich erstellt", Objects.requireNonNull(responseEntity.getBody()).getMessage(), "Message should be 'Rezept erfolgreich erstellt'");
+                assertEquals(rezept, Objects.requireNonNull(responseEntity.getBody()).getData().get("rezept"), "Rezept should be returned");
+                assertEquals(1, Objects.requireNonNull(responseEntity.getBody()).getData().size(), "Response should contain only one element");
+                assertEquals(200, Objects.requireNonNull(responseEntity.getBody()).getStatusCode(), STATUS_CODE_SHOULD_BE_200);
+                assertNotNull(Objects.requireNonNull(responseEntity.getBody()).getTimeStamp(), "Timestamp should not be null");
+                assertEquals("Rezept erfolgreich zur Datenbank hinzugefügt", Objects.requireNonNull(responseEntity.getBody()).getDeveloperMessage(), "Developer message should be 'Rezept erfolgreich zur Datenbank hinzugefügt'");
 
-        // Add more assertions based on the expected behavior
     }
 
-    // Add tests for other methods in RezeptServiceImplementation
 
     @Test
-    public void testGetRezept_WhenRezeptExists_ShouldReturnRezept() {
-        String title = "someTitle";
-        Rezept rezept = new Rezept(1L, title, "someRezeptur", List.of("someTags"));
+    void testGetRezept_WhenRezeptExists_ShouldReturnRezept() {
+        String title = SOME_TITLE;
+        Rezept rezept = new Rezept(1L, title, SOME_REZEPTUR, List.of(SOME_TAGS));
         when(rezeptRepository.findByTitel(title)).thenReturn(Optional.of(rezept));
 
         ResponseEntity<HttpResponse> responseEntity = rezeptService.getRezept(title);
 
-        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        assertTrue(Objects.requireNonNull(responseEntity.getBody()).getData().get("rezept").toString().contains("1"));
-        assertFalse(Objects.requireNonNull(responseEntity.getBody()).getData().get("rezept").toString().contains("2"));
-        // Add more assertions based on the expected behavior
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode(), STATUS_CODE_SHOULD_BE_200);
+        assertTrue(Objects.requireNonNull(responseEntity.getBody()).getData().get("rezept").toString().contains("1"), "Rezept should be returned");
+        assertFalse(Objects.requireNonNull(responseEntity.getBody()).getData().get("rezept").toString().contains("2"), "Rezept should be returned");
     }
 
     @Test
-    public void testGetRezept_WhenRezeptNotExists_ShouldReturnNotFound() {
+    void testGetRezept_WhenRezeptNotExists_ShouldReturnNotFound() {
         String title = "nonExistentTitle";
         when(rezeptRepository.findByTitel(title)).thenReturn(Optional.empty());
 
         ResponseEntity<HttpResponse> responseEntity = rezeptService.getRezept(title);
 
-        assertEquals(HttpStatus.NOT_FOUND, Objects.requireNonNull(responseEntity.getBody()).getStatus());
-        // Add more assertions based on the expected behavior
+        assertEquals(HttpStatus.NOT_FOUND, Objects.requireNonNull(responseEntity.getBody()).getStatus(), STATUS_CODE_SHOULD_BE_404);
     }
 
     @Test
-    public void testUpdateRezept_WhenRezeptExists_ShouldReturnUpdatedRezept() {
+    void testUpdateRezept_WhenRezeptExists_ShouldReturnUpdatedRezept() {
         Long id = 1L;
-        Rezept rezept = new Rezept(id, "someTitle", "someRezeptur", List.of("someTags"));
+        Rezept rezept = new Rezept(id, SOME_TITLE, SOME_REZEPTUR, List.of(SOME_TAGS));
         when(rezeptRepository.findById(id)).thenReturn(Optional.of(rezept));
         when(rezeptRepository.save(rezept)).thenReturn(rezept);
 
         ResponseEntity<HttpResponse> responseEntity = rezeptService.updateRezept(id, rezept);
 
-        assertEquals(HttpStatus.OK, Objects.requireNonNull(responseEntity.getBody()).getStatus());
-        // Add more assertions based on the expected behavior
+        assertEquals(HttpStatus.OK, Objects.requireNonNull(responseEntity.getBody()).getStatus(), STATUS_CODE_SHOULD_BE_200);
     }
 
     @Test
-    public void testUpdateRezept_WhenRezeptNotExists_ShouldReturnNotFound() {
+    void testUpdateRezept_WhenRezeptNotExists_ShouldReturnNotFound() {
         Long id = 1L;
-        Rezept rezept = new Rezept(id, "someTitle", "someRezeptur", List.of("someTags"));
+        Rezept rezept = new Rezept(id, SOME_TITLE, SOME_REZEPTUR, List.of(SOME_TAGS));
         when(rezeptRepository.findById(id)).thenReturn(Optional.empty());
 
         ResponseEntity<HttpResponse> responseEntity = rezeptService.updateRezept(id, rezept);
 
-        assertEquals(HttpStatus.NOT_FOUND, Objects.requireNonNull(responseEntity.getBody()).getStatus());
-        // Add more assertions based on the expected behavior
+        assertEquals(HttpStatus.NOT_FOUND, Objects.requireNonNull(responseEntity.getBody()).getStatus(), STATUS_CODE_SHOULD_BE_404);
     }
 
     @Test
-    public void testDeleteRezept_WhenRezeptExists_ShouldReturnDeletedRezept() {
+    void testDeleteRezept_WhenRezeptExists_ShouldReturnDeletedRezept() {
         Long id = 1L;
-        Rezept rezept = new Rezept(id, "someTitle", "someRezeptur", List.of("someTags"));
+        Rezept rezept = new Rezept(id, SOME_TITLE, SOME_REZEPTUR, List.of(SOME_TAGS));
         when(rezeptRepository.findById(id)).thenReturn(Optional.of(rezept));
 
         ResponseEntity<HttpResponse> responseEntity = rezeptService.deleteRezept(id);
 
-        assertEquals(HttpStatus.OK, Objects.requireNonNull(responseEntity.getBody()).getStatus());
-        // Add more assertions based on the expected behavior
+        assertEquals(HttpStatus.OK, Objects.requireNonNull(responseEntity.getBody()).getStatus(), STATUS_CODE_SHOULD_BE_200);
     }
 
     @Test
-    public void testDeleteRezept_WhenRezeptNotExists_ShouldReturnNotFound() {
+    void testDeleteRezept_WhenRezeptNotExists_ShouldReturnNotFound() {
         Long id = 1L;
         when(rezeptRepository.findById(id)).thenReturn(Optional.empty());
 
         ResponseEntity<HttpResponse> responseEntity = rezeptService.deleteRezept(id);
 
-        assertEquals(HttpStatus.NOT_FOUND, Objects.requireNonNull(responseEntity.getBody()).getStatus());
-        // Add more assertions based on the expected behavior
+        assertEquals(HttpStatus.NOT_FOUND, Objects.requireNonNull(responseEntity.getBody()).getStatus(), STATUS_CODE_SHOULD_BE_404);
     }
 
     @Test
-    public void testGetAllRezepte_WhenRezepteExists_ShouldReturnRezepte() {
-        List<Rezept> rezepte = List.of(new Rezept(1L, "someTitle", "someRezeptur", List.of("someTags")));
+    void testGetAllRezepte_WhenRezepteExists_ShouldReturnRezepte() {
+        List<Rezept> rezepte = List.of(new Rezept(1L, SOME_TITLE, SOME_REZEPTUR, List.of(SOME_TAGS)));
         when(rezeptRepository.findAll()).thenReturn(rezepte);
 
         ResponseEntity<HttpResponse> responseEntity = rezeptService.getAllRezepte();
 
-        assertEquals(HttpStatus.OK, Objects.requireNonNull(responseEntity.getBody()).getStatus());
-        // Add more assertions based on the expected behavior
+        assertEquals(HttpStatus.OK, Objects.requireNonNull(responseEntity.getBody()).getStatus(), STATUS_CODE_SHOULD_BE_200);
     }
 
     @Test
-    public void testGetAllRezepte_WhenRezepteNotExists_ShouldReturnNotFound() {
+    void testGetAllRezepte_WhenRezepteNotExists_ShouldReturnNotFound() {
         when(rezeptRepository.findAll()).thenReturn(List.of());
 
         ResponseEntity<HttpResponse> responseEntity = rezeptService.getAllRezepte();
 
-        assertEquals(HttpStatus.NOT_FOUND, Objects.requireNonNull(responseEntity.getBody()).getStatus());
-        // Add more assertions based on the expected behavior
+        assertEquals(HttpStatus.NOT_FOUND, Objects.requireNonNull(responseEntity.getBody()).getStatus(), STATUS_CODE_SHOULD_BE_404);
     }
 
 
-    // Add more tests as needed
 }

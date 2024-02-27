@@ -15,6 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@SuppressWarnings("PMD.JUnitTestsShouldIncludeAssert")
 class AktivesKochbuchApplicationTests {
 
     @Autowired
@@ -31,19 +32,20 @@ class AktivesKochbuchApplicationTests {
     @Test
     void shouldLoad() throws Exception {
         this.mockMvc.perform(get("/rezepte/someTitle")).andDo(print()).andExpect(content().json("{\"statusCode\":404}"));
-        this.mockMvc.perform(get("/rezepte")).andDo(print()).andExpect(content().json("{\"statusCode\":200}"));
-        this.mockMvc.perform(get("/rezepte/Spaghetti Bolognese")).andDo(print()).andExpect(content().json("{\"statusCode\":200}"));
-        this.mockMvc.perform(delete("/rezepte/1")).andDo(print()).andExpect(content().json("{\"statusCode\":200}"));
+        this.mockMvc.perform(get("/rezepte")).andDo(print()).andExpect(content().json(getStatusCodeJson()));
+        this.mockMvc.perform(get("/rezepte/Spaghetti Bolognese")).andDo(print()).andExpect(content().json(getStatusCodeJson()));
+        this.mockMvc.perform(delete("/rezepte/1")).andDo(print()).andExpect(content().json(getStatusCodeJson()));
         this.mockMvc.perform(post("/rezepte").contentType(MediaType.APPLICATION_JSON)
                         .content("{\"id\":1,\"titel\":\"Spaghetti Bolognese\",\"rezeptur\":\"Spaghetti, Tomatensoße, Hackfleisch\",\"tags\":[\"Nudeln\",\"Fleisch\"]}"))
                 .andDo(print())
-                .andExpect(content().json("{\"statusCode\":200}"))
+                .andExpect(content().json(getStatusCodeJson()))
                 .andReturn();
         this.mockMvc.perform(delete("/rezepte/11")).andDo(print()).andExpect(content().json("{\"statusCode\":404}"));
-
-
     }
 
+    private static String getStatusCodeJson() {
+        return "{\"statusCode\":200}";
+    }
 
 
 }

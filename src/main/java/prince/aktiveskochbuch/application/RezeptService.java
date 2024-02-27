@@ -25,7 +25,7 @@ public class RezeptService implements GetRezeptUseCase, PostRezeptUseCase, Delet
 
     @Override
     public ResponseEntity<HttpResponse> createRezept(Rezept rezept) {
-        rezept = rezeptRepository.save(rezept);
+        rezeptRepository.save(rezept);
 
         return ResponseEntity.ok(
                 HttpResponse.builder()

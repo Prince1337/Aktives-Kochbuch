@@ -18,70 +18,73 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")
 class RezeptDtoTest {
 
+    public static final String SOME_TITLE = "someTitle";
+    public static final String SOME_REZEPTUR = "someRezeptur";
+    public static final String SOME_TAGS = "someTags";
     @Mock
     private RezeptRepository rezeptRepository;
     @InjectMocks
     private RezeptService rezeptService;
 
     @Test
-    public void testCreateRezept() {
-        RezeptDto rezeptDto = RezeptDto.builder().titel("someTitle").rezeptur("someRezeptur").tags(List.of("someTags")).build();
+    void testCreateRezept() {
+        RezeptDto rezeptDto = RezeptDto.builder().titel(SOME_TITLE).rezeptur(SOME_REZEPTUR).tags(List.of(SOME_TAGS)).build();
         Rezept rezept = Rezept.builder().titel(rezeptDto.getTitel()).rezeptur(rezeptDto.getRezeptur()).tags(rezeptDto.getTags()).build();
         when(rezeptRepository.save(rezept)).thenReturn(rezept);
 
         ResponseEntity<HttpResponse> responseEntity = rezeptService.createRezept(rezept);
 
-        assertEquals(HttpStatus.OK, Objects.requireNonNull(responseEntity.getBody()).getStatus());
-        // Add more assertions based on the expected behavior
+        assertEquals(HttpStatus.OK, Objects.requireNonNull(responseEntity.getBody()).getStatus(), "Status should be OK");
     }
 
     @Test
     void getTitel() {
-        RezeptDto rezeptDto = RezeptDto.builder().titel("someTitle").rezeptur("someRezeptur").tags(List.of("someTags")).build();
-        assertEquals("someTitle", rezeptDto.getTitel());
+        RezeptDto rezeptDto = RezeptDto.builder().titel(SOME_TITLE).rezeptur(SOME_REZEPTUR).tags(List.of(SOME_TAGS)).build();
+        assertEquals(SOME_TITLE, rezeptDto.getTitel(), "Title should be 'someTitle'");
     }
 
     @Test
     void getRezeptur() {
-        RezeptDto rezeptDto = RezeptDto.builder().titel("someTitle").rezeptur("someRezeptur").tags(List.of("someTags")).build();
-        assertEquals("someRezeptur", rezeptDto.getRezeptur());
+        RezeptDto rezeptDto = RezeptDto.builder().titel(SOME_TITLE).rezeptur(SOME_REZEPTUR).tags(List.of(SOME_TAGS)).build();
+        assertEquals(SOME_REZEPTUR, rezeptDto.getRezeptur(), "Rezeptur should be 'someRezeptur'");
     }
 
     @Test
     void getTags() {
-        RezeptDto rezeptDto = RezeptDto.builder().titel("someTitle").rezeptur("someRezeptur").tags(List.of("someTags")).build();
-        assertEquals(List.of("someTags"), rezeptDto.getTags());
+        RezeptDto rezeptDto = RezeptDto.builder().titel(SOME_TITLE).rezeptur(SOME_REZEPTUR).tags(List.of(SOME_TAGS)).build();
+        assertEquals(List.of(SOME_TAGS), rezeptDto.getTags(), "Tags should be 'someTags'");
     }
 
     @Test
     void setTitel() {
-        RezeptDto rezeptDto = RezeptDto.builder().titel("someTitle").rezeptur("someRezeptur").tags(List.of("someTags")).build();
+        RezeptDto rezeptDto = RezeptDto.builder().titel(SOME_TITLE).rezeptur(SOME_REZEPTUR).tags(List.of(SOME_TAGS)).build();
         rezeptDto.setTitel("newTitle");
-        assertEquals("newTitle", rezeptDto.getTitel());
+        assertEquals("newTitle", rezeptDto.getTitel(), "Title should be 'newTitle'");
     }
 
     @Test
     void setRezeptur() {
-        RezeptDto rezeptDto = RezeptDto.builder().titel("someTitle").rezeptur("someRezeptur").tags(List.of("someTags")).build();
+        RezeptDto rezeptDto = RezeptDto.builder().titel(SOME_TITLE).rezeptur(SOME_REZEPTUR).tags(List.of(SOME_TAGS)).build();
         rezeptDto.setRezeptur("newRezeptur");
-        assertEquals("newRezeptur", rezeptDto.getRezeptur());
+        assertEquals("newRezeptur", rezeptDto.getRezeptur(), "Rezeptur should be 'newRezeptur'");
     }
 
     @Test
     void setTags() {
-        RezeptDto rezeptDto = RezeptDto.builder().titel("someTitle").rezeptur("someRezeptur").tags(List.of("someTags")).build();
+        RezeptDto rezeptDto = RezeptDto.builder().titel(SOME_TITLE).rezeptur(SOME_REZEPTUR).tags(List.of(SOME_TAGS)).build();
         rezeptDto.setTags(List.of("newTags"));
-        assertEquals(List.of("newTags"), rezeptDto.getTags());
+        assertEquals(List.of("newTags"), rezeptDto.getTags(), "Tags should be 'newTags'");
     }
 
     @Test
     void testConstructor() {
-        RezeptDto rezeptDto = new RezeptDto("someTitle", "someRezeptur", List.of("someTags"));
+        RezeptDto rezeptDto = new RezeptDto(SOME_TITLE, SOME_REZEPTUR, List.of(SOME_TAGS));
 
-        assertEquals("someTitle", rezeptDto.getTitel());
-        assertEquals("someRezeptur", rezeptDto.getRezeptur());
-        assertEquals(List.of("someTags"), rezeptDto.getTags());
+        assertEquals(SOME_TITLE, rezeptDto.getTitel(), "Title should be 'someTitle'");
+        assertEquals(SOME_REZEPTUR, rezeptDto.getRezeptur(), "Rezeptur should");
+        assertEquals(List.of(SOME_TAGS), rezeptDto.getTags(), "Tags should be 'someTags'");
     }
 }
