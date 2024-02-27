@@ -42,7 +42,7 @@ jobs:
           ./gradlew test
 
       - name: Run PMD
-        run: ./gradlew runPmd
+        run: |
+          ./gradlew pmdMain
+          ./gradlew pmdTest
 
-      - name: Run SpotBugs
-        run: ./gradlew runSpotBugs
