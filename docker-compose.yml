@@ -18,3 +18,15 @@ services:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     command:
       - --config.file=/etc/prometheus/prometheus.yml
+
+  zipkin:
+    container_name: zipkin
+    image: openzipkin/zipkin
+    ports:
+      - "9411:9411"
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+    driver: bridge

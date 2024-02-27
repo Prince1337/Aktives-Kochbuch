@@ -33,6 +33,10 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     implementation 'io.micrometer:micrometer-registry-prometheus:1.0.0-rc.1'
 
+    implementation 'io.micrometer:micrometer-tracing-bridge-brave'
+    implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
 }
 
 test {

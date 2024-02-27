@@ -23,6 +23,7 @@ import java.util.Optional;
 @Slf4j
 public class RezeptService implements GetRezeptUseCase, PostRezeptUseCase, DeleteRezeptUseCase, PutRezeptUseCase {
 
+    public static final String REZEPT_NICHT_GEFUNDEN = "Rezept nicht gefunden";
     private final RezeptRepository rezeptRepository;
 
     @Override
@@ -47,10 +48,10 @@ public class RezeptService implements GetRezeptUseCase, PostRezeptUseCase, Delet
     public ResponseEntity<HttpResponse> deleteRezept(Long id) {
         log.info("RezeptService: deleteRezept: id: {}", id);
         if(rezeptRepository.findById(id).isEmpty()) {
-            log.info("Rezept nicht gefunden");
+            log.info(REZEPT_NICHT_GEFUNDEN);
             return ResponseEntity.ok(
                     HttpResponse.builder()
-                            .message("Rezept nicht gefunden")
+                            .message(REZEPT_NICHT_GEFUNDEN)
                             .developerMessage("Rezept nicht in der Datenbank gefunden")
                             .status(HttpStatus.NOT_FOUND)
                             .statusCode(HttpStatus.NOT_FOUND.value())
@@ -105,10 +106,10 @@ public class RezeptService implements GetRezeptUseCase, PostRezeptUseCase, Delet
         log.info("rezeptRepository.findByTitel(title) wurde ausgeführt");
         log.info("RezeptService: getRezept: rezept: {}", rezept);
         if (rezept.isEmpty()) {
-            log.info("Rezept nicht gefunden");
+            log.info(REZEPT_NICHT_GEFUNDEN);
             return ResponseEntity.ok(
                     HttpResponse.builder()
-                            .message("Rezept nicht gefunden")
+                            .message(REZEPT_NICHT_GEFUNDEN)
                             .developerMessage("Rezept nicht in der Datenbank gefunden")
                             .status(HttpStatus.NOT_FOUND)
                             .statusCode(HttpStatus.NOT_FOUND.value())
@@ -133,10 +134,10 @@ public class RezeptService implements GetRezeptUseCase, PostRezeptUseCase, Delet
         Optional<Rezept> newRezept = rezeptRepository.findById(id);
         log.info("rezeptRepository.findById(id) wurde ausgeführt");
         if (newRezept.isEmpty()) {
-            log.info("Rezept nicht gefunden");
+            log.info(REZEPT_NICHT_GEFUNDEN);
             return ResponseEntity.ok(
                     HttpResponse.builder()
-                            .message("Rezept nicht gefunden")
+                            .message(REZEPT_NICHT_GEFUNDEN)
                             .developerMessage("Rezept nicht in der Datenbank gefunden")
                             .status(HttpStatus.NOT_FOUND)
                             .statusCode(HttpStatus.NOT_FOUND.value())
