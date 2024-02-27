@@ -10,4 +10,4 @@ Der Anwender kann entweder interaktiv einmalig Vorschläge anfordern. Oder er st
 
 Der Rhythmus wird durch Angabe der Wochentage beschrieben, an denen Vorschläge geschickt werden, z.B. „jeden Freitag und Samstag“. Außerdem kann zu jedem Tag eingestellt werden, um welche Uhrzeit die Vorschläge eintreffen sollen.
 
-Die Vorschläge treffen beim Anwender per Email ein, die Titel und Bild enthält und einen Link auf das vollständige Rezept im Kochbuch.
+Die Vorschläge treffen beim Anwender per E-mail ein, die Titel und Bild enthält und einen Link auf das vollständige Rezept im Kochbuch.
