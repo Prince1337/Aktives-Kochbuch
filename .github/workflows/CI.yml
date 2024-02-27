@@ -40,3 +40,9 @@ jobs:
           chmod +x ./gradlew
           ./gradlew clean
           ./gradlew test
+
+      - name: Run PMD
+        run: ./gradlew runPmd
+
+      - name: Run SpotBugs
+        run: ./gradlew runSpotBugs
