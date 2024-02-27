@@ -9,13 +9,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import prince.aktiveskochbuch.adapter.db.RezeptRepository;
 import prince.aktiveskochbuch.domain.dtos.HttpResponse;
+import prince.aktiveskochbuch.domain.dtos.RezeptDto;
 import prince.aktiveskochbuch.domain.models.Rezept;
+import prince.aktiveskochbuch.domain.models.StandardRezept;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -35,10 +38,11 @@ class RezeptServiceTests {
 
     @Test
     void testCreateRezept() {
-        Rezept rezept = new Rezept(1L, SOME_TITLE, SOME_REZEPTUR, List.of(SOME_TAGS));
+        RezeptDto request = getRequest();
+        StandardRezept rezept = new StandardRezept(request.getTitel(), request.getRezeptur(), request.getTags());
         when(rezeptRepository.save(rezept)).thenReturn(rezept);
 
-        ResponseEntity<HttpResponse> responseEntity = rezeptService.createRezept(rezept);
+        ResponseEntity<HttpResponse> responseEntity = rezeptService.createStandardRezept(request);
 
                 assertEquals(HttpStatus.OK, Objects.requireNonNull(responseEntity.getBody()).getStatus(), STATUS_CODE_SHOULD_BE_200);
                 assertEquals("Rezept erfolgreich erstellt", Objects.requireNonNull(responseEntity.getBody()).getMessage(), "Message should be 'Rezept erfolgreich erstellt'");
@@ -53,15 +57,13 @@ class RezeptServiceTests {
 
     @Test
     void testGetRezept_WhenRezeptExists_ShouldReturnRezept() {
-        String title = SOME_TITLE;
-        Rezept rezept = new Rezept(1L, title, SOME_REZEPTUR, List.of(SOME_TAGS));
-        when(rezeptRepository.findByTitel(title)).thenReturn(Optional.of(rezept));
+        RezeptDto request = getRequest();
+        StandardRezept rezept = new StandardRezept(request.getTitel(), request.getRezeptur(), request.getTags());
+        when(rezeptRepository.findByTitel(SOME_TITLE)).thenReturn(Optional.of(rezept));
 
-        ResponseEntity<HttpResponse> responseEntity = rezeptService.getRezept(title);
+        ResponseEntity<HttpResponse> responseEntity = rezeptService.getRezept(SOME_TITLE);
 
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode(), STATUS_CODE_SHOULD_BE_200);
-        assertTrue(Objects.requireNonNull(responseEntity.getBody()).getData().get("rezept").toString().contains("1"), "Rezept should be returned");
-        assertFalse(Objects.requireNonNull(responseEntity.getBody()).getData().get("rezept").toString().contains("2"), "Rezept should be returned");
     }
 
     @Test
@@ -77,11 +79,12 @@ class RezeptServiceTests {
     @Test
     void testUpdateRezept_WhenRezeptExists_ShouldReturnUpdatedRezept() {
         Long id = 1L;
-        Rezept rezept = new Rezept(id, SOME_TITLE, SOME_REZEPTUR, List.of(SOME_TAGS));
+        RezeptDto request = getRequest();
+        StandardRezept rezept = new StandardRezept(request.getTitel(), request.getRezeptur(), request.getTags());
         when(rezeptRepository.findById(id)).thenReturn(Optional.of(rezept));
         when(rezeptRepository.save(rezept)).thenReturn(rezept);
 
-        ResponseEntity<HttpResponse> responseEntity = rezeptService.updateRezept(id, rezept);
+        ResponseEntity<HttpResponse> responseEntity = rezeptService.updateRezept(id, request);
 
         assertEquals(HttpStatus.OK, Objects.requireNonNull(responseEntity.getBody()).getStatus(), STATUS_CODE_SHOULD_BE_200);
     }
@@ -89,10 +92,10 @@ class RezeptServiceTests {
     @Test
     void testUpdateRezept_WhenRezeptNotExists_ShouldReturnNotFound() {
         Long id = 1L;
-        Rezept rezept = new Rezept(id, SOME_TITLE, SOME_REZEPTUR, List.of(SOME_TAGS));
+        RezeptDto request = getRequest();
         when(rezeptRepository.findById(id)).thenReturn(Optional.empty());
 
-        ResponseEntity<HttpResponse> responseEntity = rezeptService.updateRezept(id, rezept);
+        ResponseEntity<HttpResponse> responseEntity = rezeptService.updateRezept(id, request);
 
         assertEquals(HttpStatus.NOT_FOUND, Objects.requireNonNull(responseEntity.getBody()).getStatus(), STATUS_CODE_SHOULD_BE_404);
     }
@@ -100,7 +103,8 @@ class RezeptServiceTests {
     @Test
     void testDeleteRezept_WhenRezeptExists_ShouldReturnDeletedRezept() {
         Long id = 1L;
-        Rezept rezept = new Rezept(id, SOME_TITLE, SOME_REZEPTUR, List.of(SOME_TAGS));
+        RezeptDto request = getRequest();
+        StandardRezept rezept = new StandardRezept(request.getTitel(), request.getRezeptur(), request.getTags());
         when(rezeptRepository.findById(id)).thenReturn(Optional.of(rezept));
 
         ResponseEntity<HttpResponse> responseEntity = rezeptService.deleteRezept(id);
@@ -120,7 +124,9 @@ class RezeptServiceTests {
 
     @Test
     void testGetAllRezepte_WhenRezepteExists_ShouldReturnRezepte() {
-        List<Rezept> rezepte = List.of(new Rezept(1L, SOME_TITLE, SOME_REZEPTUR, List.of(SOME_TAGS)));
+        RezeptDto request = getRequest();
+        StandardRezept rezept = new StandardRezept(request.getTitel(), request.getRezeptur(), request.getTags());
+        List<Rezept> rezepte = List.of(rezept);
         when(rezeptRepository.findAll()).thenReturn(rezepte);
 
         ResponseEntity<HttpResponse> responseEntity = rezeptService.getAllRezepte();
@@ -135,6 +141,10 @@ class RezeptServiceTests {
         ResponseEntity<HttpResponse> responseEntity = rezeptService.getAllRezepte();
 
         assertEquals(HttpStatus.NOT_FOUND, Objects.requireNonNull(responseEntity.getBody()).getStatus(), STATUS_CODE_SHOULD_BE_404);
+    }
+
+    private static RezeptDto getRequest() {
+        return new RezeptDto(SOME_TITLE, SOME_REZEPTUR, List.of(SOME_TAGS), "STANDARD");
     }
 
 

@@ -5,7 +5,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import prince.aktiveskochbuch.adapter.db.RezeptRepository;
-import prince.aktiveskochbuch.domain.models.Rezept;
+import prince.aktiveskochbuch.domain.models.GlutenfreiesRezept;
+import prince.aktiveskochbuch.domain.models.StandardRezept;
+import prince.aktiveskochbuch.domain.models.VegetarischesRezept;
 
 import java.util.List;
 
@@ -19,13 +21,15 @@ public class AktivesKochbuchApplication {
     @Bean
     CommandLineRunner run(RezeptRepository rezeptRepository) {
         return args -> {
-            rezeptRepository.save(new Rezept(1L, "Spaghetti Bolognese", "Spaghetti, Ei, Speck, Parmesan, Pfeffer, Salz", List.of("Italienisch", "Fleisch")));
-            rezeptRepository.save(new Rezept(2L, "Pancakes", "Mehl, Milch, Ei, Zucker, Salz, Butter", List.of("Amerikanisch", "Frühstück")));
-            rezeptRepository.save(new Rezept(3L, "Kartoffelsalat", "Kartoffeln, Zwiebeln, Essig, Öl, Salz, Pfeffer", List.of("Deutsch", "Salat")));
-            rezeptRepository.save(new Rezept(4L, "Käsespätzle", "Mehl, Ei, Milch, Käse, Zwiebeln, Salz, Pfeffer", List.of("Deutsch", "Käse")));
-            rezeptRepository.save(new Rezept(5L, "Lasagne", "Lasagneplatten, Hackfleisch, Tomaten, Zwiebeln, Knoblauch, Salz, Pfeffer", List.of("Italienisch", "Fleisch")));
+
+            rezeptRepository.save(new StandardRezept("Spaghetti Bolognese", "Spaghetti, Ei, Speck, Parmesan, Pfeffer, Salz", List.of("Italienisch", "Fleisch")));
+            rezeptRepository.save(new StandardRezept("Pasta Carbonara", "Pasta, Ei, Speck, Parmesan, Pfeffer, Salz", List.of("Südeuropäisch", "Fleisch")));
+
+            rezeptRepository.save(new VegetarischesRezept("Vegetarische Lasagne", "Lasagneplatten, Tomatensauce, Gemüse, Bechamelsauce, Käse", List.of("Gesund", "Käse")));
+            rezeptRepository.save(new VegetarischesRezept("Vegetarische Pizza", "Pizzateig, Tomatensauce, Gemüse, Käse", List.of("Gesund", "Gemüse")));
+
+            rezeptRepository.save(new GlutenfreiesRezept("Glutenfreier Kuchen", "Glutenfreies Mehl, Ei, Zucker, Butter", List.of("Kuchen", "Glutenfrei")));
 
         };
     }
-
 }

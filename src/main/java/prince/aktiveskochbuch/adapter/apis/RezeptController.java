@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import prince.aktiveskochbuch.domain.dtos.HttpResponse;
-import prince.aktiveskochbuch.domain.models.Rezept;
+import prince.aktiveskochbuch.domain.dtos.RezeptDto;
 import prince.aktiveskochbuch.domain.usecases.DeleteRezeptUseCase;
 import prince.aktiveskochbuch.domain.usecases.GetRezeptUseCase;
 import prince.aktiveskochbuch.domain.usecases.PostRezeptUseCase;
@@ -19,6 +19,7 @@ import prince.aktiveskochbuch.domain.usecases.PutRezeptUseCase;
 @Slf4j
 public class RezeptController {
 
+    public static final String REZEPT_CONTROLLER_CREATE_REZEPT_REZEPT = "RezeptController: createRezept: rezept: {}";
     private final GetRezeptUseCase getRezeptUseCase;
     private final PostRezeptUseCase postRezeptUseCase;
     private final PutRezeptUseCase putRezeptUseCase;
@@ -26,9 +27,22 @@ public class RezeptController {
 
 
     @PostMapping("/rezepte")
-    public ResponseEntity<HttpResponse> createRezept(@RequestBody Rezept rezept) {
-        log.info("RezeptController: createRezept: rezept: {}", rezept);
-        return postRezeptUseCase.createRezept(rezept);
+    public ResponseEntity<HttpResponse> createRezept(@RequestBody RezeptDto request) {
+        if("VEGETARISCH".equals(request.getType())){
+            log.info(REZEPT_CONTROLLER_CREATE_REZEPT_REZEPT, request);
+            return postRezeptUseCase.createVegetarischesRezept(request);
+        }
+        else if ("GLUTENFREI".equals(request.getType())){
+            log.info(REZEPT_CONTROLLER_CREATE_REZEPT_REZEPT, request);
+            return postRezeptUseCase.createGlutenfreiesRezept(request);
+        }
+        else if ("STANDARD".equals(request.getType())){
+            log.info(REZEPT_CONTROLLER_CREATE_REZEPT_REZEPT, request);
+            return postRezeptUseCase.createStandardRezept(request);
+        }
+
+        log.info(REZEPT_CONTROLLER_CREATE_REZEPT_REZEPT, request);
+        return postRezeptUseCase.createStandardRezept(request);
     }
 
     @GetMapping("/rezepte")
@@ -44,9 +58,9 @@ public class RezeptController {
     }
 
     @PutMapping("/rezepte/{id}")
-    public ResponseEntity<HttpResponse> updateRezept(@PathVariable Long id, @RequestBody Rezept rezept) {
-        log.info("RezeptController: updateRezept: id: {}, rezept: {}", id, rezept);
-        return putRezeptUseCase.updateRezept(id, rezept);
+    public ResponseEntity<HttpResponse> updateRezept(@PathVariable Long id, @RequestBody RezeptDto request) {
+        log.info("RezeptController: updateRezept: id: {}, rezept: {}", id, request);
+        return putRezeptUseCase.updateRezept(id, request);
     }
 
     @DeleteMapping("/rezepte/{id}")

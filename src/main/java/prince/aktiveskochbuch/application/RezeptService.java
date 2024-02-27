@@ -7,7 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import prince.aktiveskochbuch.adapter.db.RezeptRepository;
 import prince.aktiveskochbuch.domain.dtos.HttpResponse;
-import prince.aktiveskochbuch.domain.models.Rezept;
+import prince.aktiveskochbuch.domain.dtos.RezeptDto;
+import prince.aktiveskochbuch.domain.models.*;
 import prince.aktiveskochbuch.domain.usecases.DeleteRezeptUseCase;
 import prince.aktiveskochbuch.domain.usecases.GetRezeptUseCase;
 import prince.aktiveskochbuch.domain.usecases.PostRezeptUseCase;
@@ -24,17 +25,55 @@ import java.util.Optional;
 public class RezeptService implements GetRezeptUseCase, PostRezeptUseCase, DeleteRezeptUseCase, PutRezeptUseCase {
 
     public static final String REZEPT_NICHT_GEFUNDEN = "Rezept nicht gefunden";
+    public static final String REZEPT = "rezept";
     private final RezeptRepository rezeptRepository;
 
     @Override
-    public ResponseEntity<HttpResponse> createRezept(Rezept rezept) {
-        log.info("RezeptService: createRezept: rezept: {}", rezept);
+    public ResponseEntity<HttpResponse> createStandardRezept(RezeptDto rezeptDto) {
+        log.info("RezeptService: createRezept: rezeptDto: {}", rezeptDto);
+        StandardRezept rezept = new StandardRezept(rezeptDto.getTitel(), rezeptDto.getRezeptur(), rezeptDto.getTags());
         rezeptRepository.save(rezept);
         log.info("rezeptRepository.save(rezept) wurde ausgeführt");
 
         return ResponseEntity.ok(
                 HttpResponse.builder()
-                        .data(Map.of("rezept", rezept))
+                        .data(Map.of(REZEPT, rezept))
+                        .message("Rezept erfolgreich erstellt")
+                        .developerMessage("Rezept erfolgreich zur Datenbank hinzugefügt")
+                        .status(HttpStatus.OK)
+                        .statusCode(HttpStatus.OK.value())
+                        .timeStamp(LocalDateTime.now())
+                        .build());
+    }
+
+    @Override
+    public ResponseEntity<HttpResponse> createVegetarischesRezept(RezeptDto rezeptDto) {
+        log.info("RezeptService: createRezept: rezept: {}", rezeptDto);
+        VegetarischesRezept rezept = new VegetarischesRezept(rezeptDto.getTitel(), rezeptDto.getRezeptur(), rezeptDto.getTags());
+        rezeptRepository.save(rezept);
+        log.info("rezeptRepository.save(rezept) wurde ausgeführt");
+
+        return ResponseEntity.ok(
+                HttpResponse.builder()
+                        .data(Map.of(REZEPT, rezept))
+                        .message("Rezept erfolgreich erstellt")
+                        .developerMessage("Rezept erfolgreich zur Datenbank hinzugefügt")
+                        .status(HttpStatus.OK)
+                        .statusCode(HttpStatus.OK.value())
+                        .timeStamp(LocalDateTime.now())
+                        .build());
+    }
+
+    @Override
+    public ResponseEntity<HttpResponse> createGlutenfreiesRezept(RezeptDto rezeptDto) {
+        log.info("RezeptService: createRezept: rezept: {}", rezeptDto);
+        GlutenfreiesRezept rezept = new GlutenfreiesRezept(rezeptDto.getTitel(), rezeptDto.getRezeptur(), rezeptDto.getTags());
+        rezeptRepository.save(rezept);
+        log.info("rezeptRepository.save(rezept) wurde ausgeführt");
+
+        return ResponseEntity.ok(
+                HttpResponse.builder()
+                        .data(Map.of(REZEPT, rezept))
                         .message("Rezept erfolgreich erstellt")
                         .developerMessage("Rezept erfolgreich zur Datenbank hinzugefügt")
                         .status(HttpStatus.OK)
@@ -119,7 +158,7 @@ public class RezeptService implements GetRezeptUseCase, PostRezeptUseCase, Delet
 
         return ResponseEntity.ok(
                 HttpResponse.builder()
-                        .data(Map.of("rezept", rezept))
+                        .data(Map.of(REZEPT, rezept))
                         .message("Rezept erfolgreich abgerufen")
                         .developerMessage("Rezept erfolgreich aus der Datenbank abgerufen")
                         .status(HttpStatus.OK)
@@ -129,8 +168,8 @@ public class RezeptService implements GetRezeptUseCase, PostRezeptUseCase, Delet
     }
 
     @Override
-    public ResponseEntity<HttpResponse> updateRezept(Long id, Rezept rezept) {
-        log.info("RezeptService: updateRezept: id: {}, rezept: {}", id, rezept);
+    public ResponseEntity<HttpResponse> updateRezept(Long id, RezeptDto rezeptDto) {
+        log.info("RezeptService: updateRezept: id: {}, rezept: {}", id, rezeptDto);
         Optional<Rezept> newRezept = rezeptRepository.findById(id);
         log.info("rezeptRepository.findById(id) wurde ausgeführt");
         if (newRezept.isEmpty()) {
@@ -145,9 +184,10 @@ public class RezeptService implements GetRezeptUseCase, PostRezeptUseCase, Delet
                             .build());
         }
 
-        newRezept.get().setTitel(rezept.getTitel());
-        newRezept.get().setRezeptur(rezept.getRezeptur());
-        newRezept.get().setTags(rezept.getTags());
+        newRezept.get().setTitel(rezeptDto.getTitel());
+        newRezept.get().setRezeptur(rezeptDto.getRezeptur());
+        newRezept.get().setTags(rezeptDto.getTags());
+        newRezept.get().setType(Type.fromString(rezeptDto.getType()));
 
         log.info("RezeptService: updateRezept: newRezept: {}", newRezept);
         rezeptRepository.save(newRezept.get());
@@ -155,7 +195,7 @@ public class RezeptService implements GetRezeptUseCase, PostRezeptUseCase, Delet
 
         return ResponseEntity.ok(
                 HttpResponse.builder()
-                        .data(Map.of("rezept", newRezept))
+                        .data(Map.of(REZEPT, newRezept))
                         .message("Rezept erfolgreich aktualisiert")
                         .developerMessage("Rezept erfolgreich in der Datenbank aktualisiert")
                         .status(HttpStatus.OK)

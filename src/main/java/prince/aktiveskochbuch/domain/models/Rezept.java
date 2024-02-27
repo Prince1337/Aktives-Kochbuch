@@ -2,11 +2,8 @@ package prince.aktiveskochbuch.domain.models;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
 
 import java.util.List;
 
@@ -14,11 +11,12 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class Rezept {
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@SuppressWarnings("PMD.AbstractClassWithoutAbstractMethod")
+public abstract class Rezept {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @Column(nullable = false, unique = true)
@@ -28,7 +26,19 @@ public class Rezept {
     private String rezeptur;
 
     @ElementCollection
-    @Cascade(CascadeType.ALL)
+    @CollectionTable(name = "rezept_tags", joinColumns = @JoinColumn(name = "rezept_id"))
+    @Column(name = "tag")
     private List<String> tags;
+
+    @Column(nullable = false)
+    private Type type;
+
+
+    public Rezept(String titel, String rezeptur, List<String> tags, String type) {
+        this.titel = titel;
+        this.rezeptur = rezeptur;
+        this.tags = tags;
+        this.type = Type.fromString(type);
+    }
 
 }

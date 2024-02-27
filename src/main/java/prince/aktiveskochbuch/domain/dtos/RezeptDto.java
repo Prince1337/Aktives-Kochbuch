@@ -16,4 +16,5 @@ public class RezeptDto {
     private String titel;
     private String rezeptur;
     private List<String> tags;
+    private String type;
 }

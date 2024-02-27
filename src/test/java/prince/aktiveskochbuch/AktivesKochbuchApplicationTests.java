@@ -36,7 +36,7 @@ class AktivesKochbuchApplicationTests {
         this.mockMvc.perform(get("/rezepte/Spaghetti Bolognese")).andDo(print()).andExpect(content().json(getStatusCodeJson()));
         this.mockMvc.perform(delete("/rezepte/1")).andDo(print()).andExpect(content().json(getStatusCodeJson()));
         this.mockMvc.perform(post("/rezepte").contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"id\":1,\"titel\":\"Spaghetti Bolognese\",\"rezeptur\":\"Spaghetti, Tomatensoße, Hackfleisch\",\"tags\":[\"Nudeln\",\"Fleisch\"]}"))
+                        .content("{\"titel\":\"Spaghetti Bolognese\",\"rezeptur\":\"Spaghetti, Tomatensoße, Hackfleisch\",\"tags\":[\"Nudeln\",\"Fleisch\"], \"type\":\"STANDARD\"}"))
                 .andDo(print())
                 .andExpect(content().json(getStatusCodeJson()))
                 .andReturn();

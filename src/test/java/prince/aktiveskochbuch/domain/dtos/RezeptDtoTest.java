@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import prince.aktiveskochbuch.adapter.db.RezeptRepository;
 import prince.aktiveskochbuch.application.RezeptService;
 import prince.aktiveskochbuch.domain.models.Rezept;
+import prince.aktiveskochbuch.domain.models.StandardRezept;
 
 import java.util.List;
 import java.util.Objects;
@@ -31,11 +32,11 @@ class RezeptDtoTest {
 
     @Test
     void testCreateRezept() {
-        RezeptDto rezeptDto = RezeptDto.builder().titel(SOME_TITLE).rezeptur(SOME_REZEPTUR).tags(List.of(SOME_TAGS)).build();
-        Rezept rezept = Rezept.builder().titel(rezeptDto.getTitel()).rezeptur(rezeptDto.getRezeptur()).tags(rezeptDto.getTags()).build();
+        RezeptDto rezeptDto = RezeptDto.builder().titel(SOME_TITLE).rezeptur(SOME_REZEPTUR).tags(List.of(SOME_TAGS)).type("STANDARD").build();
+        Rezept rezept = new StandardRezept(rezeptDto.getTitel(), rezeptDto.getRezeptur(), rezeptDto.getTags());
         when(rezeptRepository.save(rezept)).thenReturn(rezept);
 
-        ResponseEntity<HttpResponse> responseEntity = rezeptService.createRezept(rezept);
+        ResponseEntity<HttpResponse> responseEntity = rezeptService.createStandardRezept(rezeptDto);
 
         assertEquals(HttpStatus.OK, Objects.requireNonNull(responseEntity.getBody()).getStatus(), "Status should be OK");
     }
@@ -81,10 +82,11 @@ class RezeptDtoTest {
 
     @Test
     void testConstructor() {
-        RezeptDto rezeptDto = new RezeptDto(SOME_TITLE, SOME_REZEPTUR, List.of(SOME_TAGS));
+        RezeptDto rezeptDto = new RezeptDto(SOME_TITLE, SOME_REZEPTUR, List.of(SOME_TAGS), "STANDARD");
 
         assertEquals(SOME_TITLE, rezeptDto.getTitel(), "Title should be 'someTitle'");
         assertEquals(SOME_REZEPTUR, rezeptDto.getRezeptur(), "Rezeptur should");
         assertEquals(List.of(SOME_TAGS), rezeptDto.getTags(), "Tags should be 'someTags'");
     }
+
 }

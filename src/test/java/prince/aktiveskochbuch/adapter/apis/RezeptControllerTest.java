@@ -9,7 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import prince.aktiveskochbuch.application.RezeptService;
 import prince.aktiveskochbuch.domain.dtos.HttpResponse;
-import prince.aktiveskochbuch.domain.models.Rezept;
+import prince.aktiveskochbuch.domain.dtos.RezeptDto;
+import prince.aktiveskochbuch.domain.models.StandardRezept;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,10 +23,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class RezeptControllerTest {
 
+    public static final String REZEPT = "rezept";
     private final String someTitle = "someTitle";
-    private final String someRezeptur = "someRezeptur";
-    private final String someTags = "someTags";
-    private final String rezept = "rezept";
     private final String messageStatus200 = "Status code should be 200";
     @Mock
     private RezeptService rezeptService;
@@ -36,27 +35,29 @@ class RezeptControllerTest {
 
     @Test
     void testCreateRezept() {
-        Rezept rezept = new Rezept(1L, someTitle, someRezeptur, List.of(someTags));
+        RezeptDto request = getRequest();
+        StandardRezept rezept = new StandardRezept(request.getTitel(), request.getRezeptur(), request.getTags());
+
         HttpResponse response = HttpResponse.builder()
                 .status(HttpStatus.OK)
                 .message("Rezept erfolgreich erstellt")
-                .data(Map.of(this.rezept, rezept))
+                .data(Map.of(REZEPT, rezept))
                 .statusCode(200)
                 .timeStamp(LocalDateTime.now())
                 .developerMessage("Rezept erfolgreich zur Datenbank hinzugefügt")
                 .build();
 
-        when(rezeptService.createRezept(any(Rezept.class))).thenReturn(ResponseEntity.ok(response));
+        when(rezeptService.createStandardRezept(any(RezeptDto.class))).thenReturn(ResponseEntity.ok(response));
 
-        ResponseEntity<HttpResponse> responseEntity = rezeptController.createRezept(rezept);
+        ResponseEntity<HttpResponse> responseEntity = rezeptController.createRezept(request);
 
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode(), messageStatus200);
-        // Add more assertions based on the expected behavior
     }
 
     @Test
     void testGetRezepte() {
-        Rezept rezept = new Rezept(1L, someTitle, someRezeptur, List.of(someTags));
+        RezeptDto request = getRequest();
+        StandardRezept rezept = new StandardRezept(request.getTitel(), request.getRezeptur(), request.getTags());
         HttpResponse response = HttpResponse.builder()
                 .status(HttpStatus.OK)
                 .message("Rezepte erfolgreich gefunden")
@@ -73,11 +74,12 @@ class RezeptControllerTest {
 
     @Test
     void testGetRezept() {
-        Rezept rezept = new Rezept(1L, someTitle, someRezeptur, List.of(someTags));
+        RezeptDto request = getRequest();
+        StandardRezept rezept = new StandardRezept(request.getTitel(), request.getRezeptur(), request.getTags());
         HttpResponse response = HttpResponse.builder()
                 .status(HttpStatus.OK)
                 .message("Rezept erfolgreich gefunden")
-                .data(Map.of(this.rezept, rezept))
+                .data(Map.of(REZEPT, rezept))
                 .statusCode(200)
                 .timeStamp(LocalDateTime.now())
                 .developerMessage("Rezept erfolgreich aus der Datenbank geholt")
@@ -90,28 +92,30 @@ class RezeptControllerTest {
     @Test
     void testUpdateRezept() {
 
-        Rezept newRezept = new Rezept(1L, "newTitle", "newRezeptur", List.of("newTags"));
+        RezeptDto request = getRequest();
+        StandardRezept newRezept = new StandardRezept(request.getTitel(), request.getRezeptur(), request.getTags());
 
         HttpResponse response = HttpResponse.builder()
                 .status(HttpStatus.OK)
                 .message("Rezept erfolgreich aktualisiert")
-                .data(Map.of(this.rezept, newRezept))
+                .data(Map.of(REZEPT, newRezept))
                 .statusCode(200)
                 .timeStamp(LocalDateTime.now())
                 .developerMessage("Rezept erfolgreich in der Datenbank aktualisiert")
                 .build();
 
-        when(rezeptService.updateRezept(1L, newRezept)).thenReturn(ResponseEntity.ok(response));
-        assertEquals(HttpStatus.OK, rezeptController.updateRezept(1L, newRezept).getStatusCode(), messageStatus200);
+        when(rezeptService.updateRezept(1L, request)).thenReturn(ResponseEntity.ok(response));
+        assertEquals(HttpStatus.OK, rezeptController.updateRezept(1L, request).getStatusCode(), messageStatus200);
     }
 
     @Test
     void testDeleteRezept() {
-        Rezept rezept = new Rezept(1L, someTitle, someRezeptur, List.of(someTags));
+        RezeptDto request = getRequest();
+        StandardRezept rezept = new StandardRezept(request.getTitel(), request.getRezeptur(), request.getTags());
         HttpResponse response = HttpResponse.builder()
                 .status(HttpStatus.OK)
                 .message("Rezept erfolgreich gelöscht")
-                .data(Map.of(this.rezept, rezept))
+                .data(Map.of(REZEPT, rezept))
                 .statusCode(200)
                 .timeStamp(LocalDateTime.now())
                 .developerMessage("Rezept erfolgreich aus der Datenbank gelöscht")
@@ -119,6 +123,12 @@ class RezeptControllerTest {
 
         when(rezeptService.deleteRezept(1L)).thenReturn(ResponseEntity.ok(response));
         assertEquals(HttpStatus.OK, rezeptController.deleteRezept(1L).getStatusCode(), messageStatus200);
+    }
+
+    private RezeptDto getRequest() {
+        String someTags = "someTags";
+        String someRezeptur = "someRezeptur";
+        return new RezeptDto(someTitle, someRezeptur, List.of(someTags), "STANDARD");
     }
 
 }

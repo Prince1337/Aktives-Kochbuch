@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import prince.aktiveskochbuch.adapter.db.RezeptRepository;
 import prince.aktiveskochbuch.application.RezeptService;
-import prince.aktiveskochbuch.domain.models.Rezept;
+import prince.aktiveskochbuch.domain.models.StandardRezept;
 
 import java.util.List;
 import java.util.Objects;
@@ -32,55 +32,67 @@ class HttpResponseTest {
 
     @Test
     void getTimeStamp() {
-        Rezept rezept = new Rezept(1L, SOME_TITLE, SOME_REZEPTUR, List.of(SOME_TAGS));
+        RezeptDto request = getRequest();
+        StandardRezept rezept = new StandardRezept(request.getTitel(), request.getRezeptur(), request.getTags());
         when(rezeptRepository.save(rezept)).thenReturn(rezept);
 
-        ResponseEntity<HttpResponse> responseEntity = rezeptService.createRezept(rezept);
+        ResponseEntity<HttpResponse> responseEntity = rezeptService.createStandardRezept(request);
         assertNotNull(Objects.requireNonNull(responseEntity.getBody()).getTimeStamp(), "Timestamp should not be null");
     }
 
+
+
     @Test
     void getStatusCode() {
-        Rezept rezept = new Rezept(1L, SOME_TITLE, SOME_REZEPTUR, List.of(SOME_TAGS));
+        RezeptDto request = getRequest();
+        StandardRezept rezept = new StandardRezept(request.getTitel(), request.getRezeptur(), request.getTags());
         when(rezeptRepository.save(rezept)).thenReturn(rezept);
 
-        ResponseEntity<HttpResponse> responseEntity = rezeptService.createRezept(rezept);
+        ResponseEntity<HttpResponse> responseEntity = rezeptService.createStandardRezept(request);
         assertEquals(200, Objects.requireNonNull(responseEntity.getBody()).getStatusCode(), "Status code should be 200");
     }
 
     @Test
     void getStatus() {
-        Rezept rezept = new Rezept(1L, SOME_TITLE, SOME_REZEPTUR, List.of(SOME_TAGS));
+        RezeptDto request = getRequest();
+        StandardRezept rezept = new StandardRezept(request.getTitel(), request.getRezeptur(), request.getTags());
         when(rezeptRepository.save(rezept)).thenReturn(rezept);
 
-        ResponseEntity<HttpResponse> responseEntity = rezeptService.createRezept(rezept);
+        ResponseEntity<HttpResponse> responseEntity = rezeptService.createStandardRezept(request);
         assertEquals(HttpStatus.OK, Objects.requireNonNull(responseEntity.getBody()).getStatus(), "Status should be OK");
     }
 
     @Test
     void getMessage() {
-        Rezept rezept = new Rezept(1L, SOME_TITLE, SOME_REZEPTUR, List.of(SOME_TAGS));
+        RezeptDto request = getRequest();
+        StandardRezept rezept = new StandardRezept(request.getTitel(), request.getRezeptur(), request.getTags());
         when(rezeptRepository.save(rezept)).thenReturn(rezept);
 
-        ResponseEntity<HttpResponse> responseEntity = rezeptService.createRezept(rezept);
+        ResponseEntity<HttpResponse> responseEntity = rezeptService.createStandardRezept(request);
         assertEquals("Rezept erfolgreich erstellt", Objects.requireNonNull(responseEntity.getBody()).getMessage(), "Message should be 'Rezept erfolgreich erstellt'");
     }
 
     @Test
     void getDeveloperMessage() {
-        Rezept rezept = new Rezept(1L, SOME_TITLE, SOME_REZEPTUR, List.of(SOME_TAGS));
+        RezeptDto request = getRequest();
+        StandardRezept rezept = new StandardRezept(request.getTitel(), request.getRezeptur(), request.getTags());
         when(rezeptRepository.save(rezept)).thenReturn(rezept);
 
-        ResponseEntity<HttpResponse> responseEntity = rezeptService.createRezept(rezept);
+        ResponseEntity<HttpResponse> responseEntity = rezeptService.createStandardRezept(request);
         assertEquals("Rezept erfolgreich zur Datenbank hinzugefügt", Objects.requireNonNull(responseEntity.getBody()).getDeveloperMessage(), "Developer message should be 'Rezept erfolgreich zur Datenbank hinzugefügt'");
     }
 
     @Test
     void getData() {
-        Rezept rezept = new Rezept(1L, SOME_TITLE, SOME_REZEPTUR, List.of(SOME_TAGS));
+        RezeptDto request = getRequest();
+        StandardRezept rezept = new StandardRezept(request.getTitel(), request.getRezeptur(), request.getTags());
         when(rezeptRepository.save(rezept)).thenReturn(rezept);
 
-        ResponseEntity<HttpResponse> responseEntity = rezeptService.createRezept(rezept);
+        ResponseEntity<HttpResponse> responseEntity = rezeptService.createStandardRezept(request);
         assertEquals(rezept, Objects.requireNonNull(responseEntity.getBody()).getData().get("rezept"), "Rezept should be returned");
+    }
+
+    private static RezeptDto getRequest() {
+        return new RezeptDto(SOME_TITLE, SOME_REZEPTUR, List.of(SOME_TAGS), "StandardRezept");
     }
 }
