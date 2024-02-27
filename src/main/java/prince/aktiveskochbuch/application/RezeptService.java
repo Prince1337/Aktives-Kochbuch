@@ -1,6 +1,7 @@
 package prince.aktiveskochbuch.application;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -19,13 +20,16 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class RezeptService implements GetRezeptUseCase, PostRezeptUseCase, DeleteRezeptUseCase, PutRezeptUseCase {
 
     private final RezeptRepository rezeptRepository;
 
     @Override
     public ResponseEntity<HttpResponse> createRezept(Rezept rezept) {
+        log.info("RezeptService: createRezept: rezept: {}", rezept);
         rezeptRepository.save(rezept);
+        log.info("rezeptRepository.save(rezept) wurde ausgeführt");
 
         return ResponseEntity.ok(
                 HttpResponse.builder()
@@ -41,7 +45,9 @@ public class RezeptService implements GetRezeptUseCase, PostRezeptUseCase, Delet
 
     @Override
     public ResponseEntity<HttpResponse> deleteRezept(Long id) {
+        log.info("RezeptService: deleteRezept: id: {}", id);
         if(rezeptRepository.findById(id).isEmpty()) {
+            log.info("Rezept nicht gefunden");
             return ResponseEntity.ok(
                     HttpResponse.builder()
                             .message("Rezept nicht gefunden")
@@ -52,6 +58,7 @@ public class RezeptService implements GetRezeptUseCase, PostRezeptUseCase, Delet
                             .build());
         }
         rezeptRepository.deleteById(id);
+        log.info("rezeptRepository.deleteById(id) wurde ausgeführt");
 
         return ResponseEntity.ok(
                 HttpResponse.builder()
@@ -67,7 +74,9 @@ public class RezeptService implements GetRezeptUseCase, PostRezeptUseCase, Delet
     @Override
     public ResponseEntity<HttpResponse> getAllRezepte() {
         List<Rezept> rezepte = rezeptRepository.findAll();
+        log.info("RezeptService: getAllRezepte: rezepte: {}", rezepte);
         if(rezepte.isEmpty()) {
+            log.info("Keine Rezepte gefunden");
             return ResponseEntity.ok(
                     HttpResponse.builder()
                             .message("Keine Rezepte gefunden")
@@ -91,8 +100,12 @@ public class RezeptService implements GetRezeptUseCase, PostRezeptUseCase, Delet
 
     @Override
     public ResponseEntity<HttpResponse> getRezept(String title) {
+        log.info("RezeptService: getRezept: title: {}", title);
         Optional<Rezept> rezept = rezeptRepository.findByTitel(title);
+        log.info("rezeptRepository.findByTitel(title) wurde ausgeführt");
+        log.info("RezeptService: getRezept: rezept: {}", rezept);
         if (rezept.isEmpty()) {
+            log.info("Rezept nicht gefunden");
             return ResponseEntity.ok(
                     HttpResponse.builder()
                             .message("Rezept nicht gefunden")
@@ -116,8 +129,11 @@ public class RezeptService implements GetRezeptUseCase, PostRezeptUseCase, Delet
 
     @Override
     public ResponseEntity<HttpResponse> updateRezept(Long id, Rezept rezept) {
+        log.info("RezeptService: updateRezept: id: {}, rezept: {}", id, rezept);
         Optional<Rezept> newRezept = rezeptRepository.findById(id);
+        log.info("rezeptRepository.findById(id) wurde ausgeführt");
         if (newRezept.isEmpty()) {
+            log.info("Rezept nicht gefunden");
             return ResponseEntity.ok(
                     HttpResponse.builder()
                             .message("Rezept nicht gefunden")
@@ -127,11 +143,14 @@ public class RezeptService implements GetRezeptUseCase, PostRezeptUseCase, Delet
                             .timeStamp(LocalDateTime.now())
                             .build());
         }
+
         newRezept.get().setTitel(rezept.getTitel());
         newRezept.get().setRezeptur(rezept.getRezeptur());
         newRezept.get().setTags(rezept.getTags());
 
+        log.info("RezeptService: updateRezept: newRezept: {}", newRezept);
         rezeptRepository.save(newRezept.get());
+        log.info("rezeptRepository.save(newRezept.get()) wurde ausgeführt");
 
         return ResponseEntity.ok(
                 HttpResponse.builder()
