@@ -44,3 +44,14 @@ pmd {
     rulesMinimumPriority = 5
     ruleSets = ["category/java/errorprone.xml", "category/java/bestpractices.xml"]
 }
+
+tasks.register('deploy') {
+    dependsOn 'build'
+    doLast {
+        copy {
+            from 'build/libs/'
+            into 'deploy/'
+            include '*.jar'
+        }
+    }
+}
