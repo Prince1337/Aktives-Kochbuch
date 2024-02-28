@@ -37,4 +37,8 @@ public abstract class Rezept {
         this.type = Type.fromString(type);
     }
 
+    @Override
+    public String toString() {
+        return "\nGericht: " + titel + "\nRezept: " + rezeptur + "\nTyp: " + type;
+    }
 }

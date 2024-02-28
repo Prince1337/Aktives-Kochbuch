@@ -1,4 +1,4 @@
-package prince.aktiveskochbuch.application;
+package prince.aktiveskochbuch.application.utils;
 
 public class RezeptConstants {
     public static final String REZEPT_NICHT_GEFUNDEN = "Rezept nicht gefunden";

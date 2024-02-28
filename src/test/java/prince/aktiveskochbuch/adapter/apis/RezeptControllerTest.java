@@ -7,7 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import prince.aktiveskochbuch.application.RezeptConstants;
+import prince.aktiveskochbuch.application.utils.RezeptConstants;
 import prince.aktiveskochbuch.domain.dtos.HttpResponse;
 import prince.aktiveskochbuch.domain.dtos.RezeptDto;
 import prince.aktiveskochbuch.domain.models.Rezept;
@@ -22,7 +22,7 @@ import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
-import static prince.aktiveskochbuch.application.RezeptConstants.*;
+import static prince.aktiveskochbuch.application.utils.RezeptConstants.*;
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")

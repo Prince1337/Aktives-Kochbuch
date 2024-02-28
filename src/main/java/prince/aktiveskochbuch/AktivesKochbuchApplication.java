@@ -4,6 +4,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableAsync;
 import prince.aktiveskochbuch.adapter.db.RezeptRepository;
 import prince.aktiveskochbuch.domain.models.GlutenfreiesRezept;
 import prince.aktiveskochbuch.domain.models.StandardRezept;
@@ -12,6 +13,7 @@ import prince.aktiveskochbuch.domain.models.VegetarischesRezept;
 import java.util.List;
 
 @SpringBootApplication
+@EnableAsync
 public class AktivesKochbuchApplication {
 
     public static void main(String[] args) {

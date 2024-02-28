@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import prince.aktiveskochbuch.application.RezeptConstants;
+import prince.aktiveskochbuch.application.utils.RezeptConstants;
 import prince.aktiveskochbuch.domain.dtos.HttpResponse;
 import prince.aktiveskochbuch.domain.dtos.RezeptDto;
 import prince.aktiveskochbuch.domain.models.Rezept;

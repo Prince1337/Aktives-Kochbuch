@@ -37,7 +37,13 @@ dependencies {
     implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
-    implementation 'org.springframework.boot:spring-boot-starter-mail:1.2.0.RELEASE'
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation 'org.springframework:spring-context-support:6.1.4'
+
+    implementation 'org.thymeleaf:thymeleaf-spring5:3.1.2.RELEASE'
+
+
+
 
 
 }

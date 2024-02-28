@@ -8,8 +8,8 @@ import prince.aktiveskochbuch.domain.dtos.VorschlaegeDto;
 import prince.aktiveskochbuch.domain.models.Rezept;
 import prince.aktiveskochbuch.domain.usecases.VorschlaegeGenerierenUseCase;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +29,12 @@ public class VorschlaegeService implements VorschlaegeGenerierenUseCase {
         int anzahlVorschlaege = Math.min(vorschlaegeDto.getNumberOfSuggestions(), passendeRezepte.size());
         log.info("VorschlaegeService: generateVorschlaege: anzahlVorschlaege: {}", anzahlVorschlaege);
 
-        vorschlaege = IntStream.range(0, anzahlVorschlaege).mapToObj(passendeRezepte::get).toList();
+        List<Rezept> list = new ArrayList<>();
+        for (int i = 0; i < anzahlVorschlaege; i++) {
+            Rezept rezept = passendeRezepte.get(i);
+            list.add(rezept);
+        }
+        vorschlaege = list;
         log.info("VorschlaegeService: generateVorschlaege: vorschlaege: {}", vorschlaege);
 
         return vorschlaege;

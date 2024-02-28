@@ -18,4 +18,9 @@ public class VegetarischesRezept extends Rezept{
         this.vegan = true;
     }
 
+    @Override
+    public String toString() {
+        return super.toString();
+    }
+
 }

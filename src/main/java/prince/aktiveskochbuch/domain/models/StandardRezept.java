@@ -17,4 +17,8 @@ public class StandardRezept extends Rezept {
         super(titel, rezeptur, tags, String.valueOf(Type.STANDARD));
     }
 
+    @Override
+    public String toString() {
+        return super.toString();
+    }
 }

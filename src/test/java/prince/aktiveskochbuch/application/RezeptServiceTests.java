@@ -19,7 +19,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static prince.aktiveskochbuch.application.RezeptConstants.*;
+import static prince.aktiveskochbuch.application.utils.RezeptConstants.*;
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("PMD.JUnitTestContainsTooManyAsserts")

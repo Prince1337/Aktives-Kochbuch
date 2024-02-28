@@ -35,7 +35,7 @@ class VorschlaegeControllerTest {
                 new VegetarischesRezept("Vegetarische Pizza", "Pizzateig, Tomatensauce, Gemüse, Käse", List.of("Gesund", "Gemüse")));
         when(vorschlaegeGenerierenUseCase.generateVorschlaege(vorschlaegeDto)).thenReturn(expectedVorschlaege);
 
-        ResponseEntity<HttpResponse> result = vorschlaegeController.generateVorschlaege(vorschlaegeDto);
+        ResponseEntity<HttpResponse> result = vorschlaegeController.generateAutomaticVorschlaege(vorschlaegeDto);
 
         assertEquals(HttpStatus.OK, result.getStatusCode(), "Status code should be 200");
         assertEquals("Vorschlaege generiert", Objects.requireNonNull(result.getBody()).getMessage(), "Message should be 'Vorschlaege generiert'");
