@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import prince.aktiveskochbuch.application.exceptions.EMailSend;
 import prince.aktiveskochbuch.domain.dtos.HttpResponse;
 import prince.aktiveskochbuch.domain.dtos.VorschlaegeDto;
 import prince.aktiveskochbuch.domain.models.Rezept;
@@ -33,7 +34,7 @@ public class VorschlaegeController {
 
 
     @PostMapping("/vorschlaege")
-    public ResponseEntity<HttpResponse> generateAutomaticVorschlaege(@RequestBody VorschlaegeDto vorschlaegeDto) {
+    public ResponseEntity<HttpResponse> generateAutomaticVorschlaege(@RequestBody VorschlaegeDto vorschlaegeDto) throws EMailSend {
         log.info("VorschlaegeController: generateVorschlaege: vorschlaegeDto: {}", vorschlaegeDto);
         List<Rezept> vorschlaege = vorschlaegeGenerierenUseCase.generateVorschlaege(vorschlaegeDto);
         sendEmailUseCase.sendAutomaticSuggestionsEmail(vorschlaege, automatischeVorschlaegeUseCase);

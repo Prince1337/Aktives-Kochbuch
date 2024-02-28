@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import prince.aktiveskochbuch.application.exceptions.EMailSend;
 import prince.aktiveskochbuch.domain.dtos.HttpResponse;
 import prince.aktiveskochbuch.domain.models.User;
 import prince.aktiveskochbuch.domain.usecases.CreateUserUseCase;
@@ -22,8 +23,9 @@ public class UserController {
     private final SendEmailUseCase sendEmailUseCase;
 
     @PostMapping
-    public ResponseEntity<HttpResponse> createUser(@RequestBody User user) {
+    public ResponseEntity<HttpResponse> createUser(@RequestBody User user) throws EMailSend {
         User newUser = createUserUseCase.saveUser(user);
+
         return ResponseEntity.created(URI.create("")).body(
                 HttpResponse.builder()
                         .timeStamp(LocalDateTime.now())

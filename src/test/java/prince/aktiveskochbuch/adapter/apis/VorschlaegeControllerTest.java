@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import prince.aktiveskochbuch.application.exceptions.EMailSend;
 import prince.aktiveskochbuch.domain.dtos.HttpResponse;
 import prince.aktiveskochbuch.domain.dtos.VorschlaegeDto;
 import prince.aktiveskochbuch.domain.models.Rezept;
@@ -29,7 +30,7 @@ class VorschlaegeControllerTest {
     private VorschlaegeController vorschlaegeController;
 
     @Test
-    void testGenerateVorschlaege() {
+    void testGenerateVorschlaege() throws EMailSend {
         VorschlaegeDto vorschlaegeDto = new VorschlaegeDto(List.of("Gesund", "Gemüse"), 3);
         List<Rezept> expectedVorschlaege = List.of(new VegetarischesRezept("Vegetarische Lasagne", "Lasagneplatten, Tomatensauce, Gemüse, Bechamelsauce, Käse", List.of("Gesund", "Käse")),
                 new VegetarischesRezept("Vegetarische Pizza", "Pizzateig, Tomatensauce, Gemüse, Käse", List.of("Gesund", "Gemüse")));

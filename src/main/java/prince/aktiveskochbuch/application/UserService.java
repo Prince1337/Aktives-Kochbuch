@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import prince.aktiveskochbuch.adapter.db.ConfirmationRepository;
 import prince.aktiveskochbuch.adapter.db.UserRepository;
+import prince.aktiveskochbuch.application.exceptions.EMailSend;
+import prince.aktiveskochbuch.application.exceptions.UserAlreadyExists;
 import prince.aktiveskochbuch.domain.models.Confirmation;
 import prince.aktiveskochbuch.domain.models.User;
 import prince.aktiveskochbuch.domain.usecases.CreateUserUseCase;
@@ -17,9 +19,9 @@ public class UserService implements CreateUserUseCase {
     private final SendEmailUseCase emailService;
 
     @Override
-    public User saveUser(User user) {
-        if (userRepository.existsByEmail(user.getEmail())) {
-            throw new RuntimeException("Email already exists");
+    public User saveUser(User user) throws EMailSend {
+        if (Boolean.TRUE.equals(existsByMail(user))) {
+            throw new UserAlreadyExists("Email already exists");
         }
 
         user.setEnabled(false);
@@ -28,14 +30,13 @@ public class UserService implements CreateUserUseCase {
         Confirmation confirmation = new Confirmation(user);
         confirmationRepository.save(confirmation);
 
-        /* TODO Send email to user with token */
         emailService.sendSimpleMessage(user.getName(), user.getEmail(), confirmation.getToken());
-        //emailService.sendMimeMessageWithAttachments(user.getName(), user.getEmail(), confirmation.getToken());
-        //emailService.sendMimeMessageWithEmbeddedFiles(user.getName(), user.getEmail(), confirmation.getToken());
-        //emailService.sendHtmlEmail(user.getName(), user.getEmail(), confirmation.getToken());
-//        emailService.sendHtmlEmailWithEmbeddedFiles(user.getName(), user.getEmail(), confirmation.getToken());
 
         return user;
+    }
+
+    private Boolean existsByMail(User user) {
+        return userRepository.existsByEmail(user.getEmail());
     }
 
     @Override
@@ -44,7 +45,7 @@ public class UserService implements CreateUserUseCase {
         User user = userRepository.findByEmailIgnoreCase(confirmation.getUser().getEmail());
         user.setEnabled(true);
         userRepository.save(user);
-        //confirmationRepository.delete(confirmation);
+        confirmationRepository.delete(confirmation);
         return Boolean.TRUE;
     }
 }

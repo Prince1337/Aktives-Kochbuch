@@ -1,6 +1,7 @@
 package prince.aktiveskochbuch.domain.usecases;
 
 import jakarta.mail.MessagingException;
+import prince.aktiveskochbuch.application.exceptions.EMailSend;
 import prince.aktiveskochbuch.domain.models.Rezept;
 
 import java.io.IOException;
@@ -9,11 +10,11 @@ import java.util.Map;
 
 public interface SendEmailUseCase {
 
-    void sendAutomaticSuggestionsEmail(List<Rezept> vorschlaege, AutomatischeVorschlaegeUseCase automatischeVorschlaegeUseCase);
+    void sendAutomaticSuggestionsEmail(List<Rezept> vorschlaege, AutomatischeVorschlaegeUseCase automatischeVorschlaegeUseCase) throws EMailSend;
 
     void sendSimpleMessage(String to,
                            String subject,
-                           String text);
+                           String text) throws EMailSend;
     void sendSimpleMessageUsingTemplate(String to,
                                         String subject,
                                         String ...templateModel);

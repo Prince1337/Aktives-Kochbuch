@@ -8,6 +8,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import prince.aktiveskochbuch.application.exceptions.EMailSend;
 import prince.aktiveskochbuch.domain.models.Rezept;
 import prince.aktiveskochbuch.domain.usecases.AutomatischeVorschlaegeUseCase;
 import prince.aktiveskochbuch.domain.usecases.SendEmailUseCase;
@@ -38,7 +39,7 @@ public class EmailSenderService implements SendEmailUseCase {
     private String fromEmail;
 
     @Override
-    public void sendAutomaticSuggestionsEmail(List<Rezept> vorschlaege, AutomatischeVorschlaegeUseCase automatischeVorschlaegeUseCase) {
+    public void sendAutomaticSuggestionsEmail(List<Rezept> vorschlaege, AutomatischeVorschlaegeUseCase automatischeVorschlaegeUseCase) throws EMailSend {
         if (automatischeVorschlaegeUseCase.isAutomaticSuggestionsActivated()) {
 
 
@@ -62,11 +63,10 @@ public class EmailSenderService implements SendEmailUseCase {
         }
     }
 
-    @Async
-    public void sendVorschlaegeMail(String name, String to, List<Rezept> vorschlaege) {
+    public void sendVorschlaegeMail(String name, String to, List<Rezept> vorschlaege) throws EMailSend {
         try {
             StringBuilder emailText = new StringBuilder();
-            emailText.append("Hallo ").append(to).append(",\n\n");
+            emailText.append("Hallo ").append(name).append(",\n\n");
             emailText.append("Hier sind Ihre automatischen Vorschläge für heute:\n");
             // Fügen Sie jeden Vorschlag aus der Liste ein
             for (Rezept vorschlag : vorschlaege) {
@@ -82,13 +82,13 @@ public class EmailSenderService implements SendEmailUseCase {
             message.setText(emailText.toString());
             emailSender.send(message);
         } catch (Exception exception) {
-            throw new RuntimeException(exception);
+            throw new EMailSend(exception);
         }
     }
 
     @Override
     @Async
-    public void sendSimpleMessage(String name, String to, String token) {
+    public void sendSimpleMessage(String name, String to, String token) throws EMailSend {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setSubject(NEW_USER_ACCOUNT_VERIFICATION);
@@ -97,27 +97,28 @@ public class EmailSenderService implements SendEmailUseCase {
             message.setText(getConfirmationMessage(name, host, token));
             emailSender.send(message);
         } catch (Exception exception) {
-            throw new RuntimeException(exception);
+            throw new EMailSend(exception);
         }
     }
 
     @Override
     public void sendSimpleMessageUsingTemplate(String to, String subject, String... templateModel) {
-
+        //Implement this method
     }
 
     @Override
     public void sendMessageWithAttachment(String to, String subject, String text, String pathToAttachment) {
-
+        //Implement this method
     }
 
     @Override
     public void sendMessageUsingThymeleafTemplate(String to, String subject, Map<String, Object> templateModel) throws IOException, MessagingException {
+        //Implement this method
 
     }
 
     @Override
     public void sendMessageUsingFreemarkerTemplate(String to, String subject, Map<String, Object> templateModel) throws IOException, MessagingException {
-
+        //Implement this method
     }
 }
