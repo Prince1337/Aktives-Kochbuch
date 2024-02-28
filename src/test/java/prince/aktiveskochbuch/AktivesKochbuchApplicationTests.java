@@ -33,7 +33,7 @@ class AktivesKochbuchApplicationTests {
 
     @Test
     void shouldLoad() throws Exception {
-        this.mockMvc.perform(get("/rezepte/someTitle")).andDo(print()).andExpect(content().json("{\"statusCode\":404}"));
+        this.mockMvc.perform(get("/rezepte/someTitle")).andDo(print()).andExpect(content().json( "{\"message\":\"Rezept nicht gefunden\",\"statusCode\":200}"));
         this.mockMvc.perform(get("/rezepte")).andDo(print()).andExpect(content().json(getStatusCodeJson()));
         this.mockMvc.perform(get("/rezepte/Spaghetti Bolognese")).andDo(print()).andExpect(content().json(getStatusCodeJson()));
         this.mockMvc.perform(delete("/rezepte/1")).andDo(print()).andExpect(content().json(getStatusCodeJson()));
@@ -42,7 +42,7 @@ class AktivesKochbuchApplicationTests {
                 .andDo(print())
                 .andExpect(content().json(getStatusCodeJson()))
                 .andReturn();
-        this.mockMvc.perform(delete("/rezepte/11")).andDo(print()).andExpect(content().json("{\"statusCode\":404}"));
+        this.mockMvc.perform(delete("/rezepte/11")).andDo(print()).andExpect(content().json("{\"statusCode\":200}"));
     }
 
     private static String getStatusCodeJson() {

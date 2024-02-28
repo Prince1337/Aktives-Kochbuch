@@ -13,10 +13,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class RezeptDto {
+public class VorschlaegeDto {
 
-    private String titel;
-    private String rezeptur;
-    private List<String> tags;
-    private String type;
+    private List<String> selectedTags;
+    private int numberOfSuggestions;
 }
