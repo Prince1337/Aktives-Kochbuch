@@ -9,7 +9,5 @@ import prince.aktiveskochbuch.domain.models.User;
 @Repository
 @RepositoryRestResource(collectionResourceRel = "confirmations", path = "confirmations")
 public interface ConfirmationRepository extends JpaRepository<Confirmation, Long> {
-    Confirmation findByToken(String token);
-
     Confirmation findByUser(User user);
 }
