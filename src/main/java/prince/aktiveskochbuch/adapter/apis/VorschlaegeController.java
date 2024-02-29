@@ -32,41 +32,38 @@ public class VorschlaegeController {
     private final SendEmailUseCase sendEmailUseCase;
     private final AutomatischeVorschlaegeUseCase automatischeVorschlaegeUseCase;
 
-
     @PostMapping("/vorschlaege")
     public ResponseEntity<HttpResponse> generateAutomaticVorschlaege(@RequestBody VorschlaegeDto vorschlaegeDto) throws EMailSend {
         log.info("VorschlaegeController: generateVorschlaege: vorschlaegeDto: {}", vorschlaegeDto);
         List<Rezept> vorschlaege = vorschlaegeGenerierenUseCase.generateVorschlaege(vorschlaegeDto);
         sendEmailUseCase.sendAutomaticSuggestionsEmail(vorschlaege, automatischeVorschlaegeUseCase);
 
-        return ResponseEntity.ok(
-                HttpResponse.builder()
-                        .status(HttpStatus.OK)
-                        .statusCode(200)
-                        .message("Vorschlaege generiert")
-                        .timeStamp(LocalDateTime.now())
-                        .developerMessage("Vorschlaege generiert")
-                        .data(Map.of("vorschlaege", vorschlaege))
-                        .build()
-        );
+        return getHttpResponseGenerateEntity(vorschlaege);
     }
 
     @PostMapping("/automatic-suggestions")
     public ResponseEntity<HttpResponse> toggleAutomaticSuggestions(@RequestParam boolean activate) {
         automatischeVorschlaegeUseCase.activateAutomaticSuggestions(activate);
-        return ResponseEntity.ok(
-                HttpResponse.builder()
-                        .status(HttpStatus.OK)
-                        .timeStamp(LocalDateTime.now())
-                        .statusCode(200)
-                        .developerMessage("Einstellungen für automatische Vorschläge aktualisiert")
-                        .message("Einstellungen erfolgreich gespeichert")
-                        .build());
+        return getHttpResponseToggleEntity();
     }
 
     @PostMapping("/schedule")
     public ResponseEntity<HttpResponse> setSchedule(@RequestParam Set<DayOfWeek> daysOfWeek, @RequestParam LocalTime time) {
         automatischeVorschlaegeUseCase.setSchedule(daysOfWeek, time);
+        return getHttpResponseScheduleEntity();
+    }
+
+    @GetMapping("/status")
+    public ResponseEntity<Map<String, Object>> getAutomaticSuggestionsStatus() {
+
+        Map<String, Object> status = new HashMap<>();
+        status.put("activated", automatischeVorschlaegeUseCase.isAutomaticSuggestionsActivated());
+        status.put("scheduledDays", automatischeVorschlaegeUseCase.getScheduledDays());
+        status.put("scheduledTime", automatischeVorschlaegeUseCase.getScheduledTime());
+        return ResponseEntity.ok(status);
+    }
+
+    private static ResponseEntity<HttpResponse> getHttpResponseScheduleEntity() {
         return ResponseEntity.ok(
                 HttpResponse.builder()
                         .status(HttpStatus.OK)
@@ -77,12 +74,27 @@ public class VorschlaegeController {
                         .build());
     }
 
-    @GetMapping("/status")
-    public ResponseEntity<Map<String, Object>> getAutomaticSuggestionsStatus() {
-        Map<String, Object> status = new HashMap<>();
-        status.put("activated", automatischeVorschlaegeUseCase.isAutomaticSuggestionsActivated());
-        status.put("scheduledDays", automatischeVorschlaegeUseCase.getScheduledDays());
-        status.put("scheduledTime", automatischeVorschlaegeUseCase.getScheduledTime());
-        return ResponseEntity.ok(status);
+    private static ResponseEntity<HttpResponse> getHttpResponseToggleEntity() {
+        return ResponseEntity.ok(
+                HttpResponse.builder()
+                        .status(HttpStatus.OK)
+                        .timeStamp(LocalDateTime.now())
+                        .statusCode(200)
+                        .developerMessage("Einstellungen für automatische Vorschläge aktualisiert")
+                        .message("Einstellungen erfolgreich gespeichert")
+                        .build());
+    }
+
+    private static ResponseEntity<HttpResponse> getHttpResponseGenerateEntity(List<Rezept> vorschlaege) {
+        return ResponseEntity.ok(
+                HttpResponse.builder()
+                        .status(HttpStatus.OK)
+                        .statusCode(200)
+                        .message("Vorschlaege generiert")
+                        .timeStamp(LocalDateTime.now())
+                        .developerMessage("Vorschlaege generiert")
+                        .data(Map.of("vorschlaege", vorschlaege))
+                        .build()
+        );
     }
 }

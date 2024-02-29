@@ -1,6 +1,5 @@
 package prince.aktiveskochbuch.application;
 
-import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -8,12 +7,13 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import prince.aktiveskochbuch.adapter.db.UserRepository;
 import prince.aktiveskochbuch.application.exceptions.EMailSend;
 import prince.aktiveskochbuch.domain.models.Rezept;
+import prince.aktiveskochbuch.domain.models.User;
 import prince.aktiveskochbuch.domain.usecases.AutomatischeVorschlaegeUseCase;
 import prince.aktiveskochbuch.domain.usecases.SendEmailUseCase;
 
-import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static prince.aktiveskochbuch.application.utils.EmailUtils.buildEmailText;
 import static prince.aktiveskochbuch.application.utils.EmailUtils.getConfirmationMessage;
 
 @Service
@@ -29,61 +30,57 @@ import static prince.aktiveskochbuch.application.utils.EmailUtils.getConfirmatio
 public class EmailSenderService implements SendEmailUseCase {
 
     public static final String NEW_USER_ACCOUNT_VERIFICATION = "New User Account Verification";
+    public static final String YOUR_AUTOMATIC_RECIPE_SUGGESTIONS = "Your Automatic Recipe Suggestions";
 
     private final JavaMailSender emailSender;
+
+    private final UserRepository userRepository;
 
     @Value("${spring.mail.verify.host}")
     private String host;
 
     @Value("${spring.mail.username}")
     private String fromEmail;
+    private Set<DayOfWeek> scheduledDays;
+    private LocalTime scheduledTime;
+    private DayOfWeek currentDay;
+    private LocalTime currentTime;
 
     @Override
     public void sendAutomaticSuggestionsEmail(List<Rezept> vorschlaege, AutomatischeVorschlaegeUseCase automatischeVorschlaegeUseCase) throws EMailSend {
-        if (automatischeVorschlaegeUseCase.isAutomaticSuggestionsActivated()) {
-
-
-            log.info("Automatic suggestions is activated");
-            Set<DayOfWeek> scheduledDays = automatischeVorschlaegeUseCase.getScheduledDays();
-            LocalTime scheduledTime = automatischeVorschlaegeUseCase.getScheduledTime();
-
-            LocalDateTime now = LocalDateTime.now();
-            DayOfWeek currentDay = now.getDayOfWeek();
-            LocalTime currentTime = now.toLocalTime();
-
-            log.info("Current day: {}", currentDay);
-            log.info("Current time: {}", currentTime);
-
-
-            if (scheduledDays.contains(currentDay) && currentTime.isAfter(scheduledTime)) {
-                // Send automatic suggestions email
-                log.info("VorschlaegeService: generateVorschlaege: vorschlaege: {}", vorschlaege);
-                sendVorschlaegeMail("user.getName()", "prince.pieritz@gmail.com", vorschlaege);
-            }
+        if (!isAutomaticSuggestionsActivated(automatischeVorschlaegeUseCase)) {
+            return;
         }
+
+        log.info("Automatic suggestions is activated");
+        setSchedule(automatischeVorschlaegeUseCase);
+
+        if (!dueDateReached()) {
+            return;
+        }
+
+        User user = userRepository.findByEmailIgnoreCase(fromEmail);
+
+        log.info("VorschlaegeService: generateVorschlaege: vorschlaege: {}", vorschlaege);
+        sendVorschlaegeMail(user.getName(), user.getEmail(), vorschlaege);
     }
 
-    public void sendVorschlaegeMail(String name, String to, List<Rezept> vorschlaege) throws EMailSend {
+    private void sendVorschlaegeMail(String name, String to, List<Rezept> vorschlaege) throws EMailSend {
         try {
-            StringBuilder emailText = new StringBuilder();
-            emailText.append("Hallo ").append(name).append(",\n\n");
-            emailText.append("Hier sind Ihre automatischen Vorschläge für heute:\n");
-            // Fügen Sie jeden Vorschlag aus der Liste ein
-            for (Rezept vorschlag : vorschlaege) {
-                emailText.append(vorschlag.toString()).append("\n");
-            }
-            // Fügen Sie zusätzliche Informationen oder Grußformel hinzu, falls erforderlich
-            emailText.append("\nViele Grüße,\nIhr Kochbuch-Team");
-
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setSubject("Your Automatic Recipe Suggestions");
-            message.setFrom(fromEmail);
-            message.setTo(to);
-            message.setText(emailText.toString());
-            emailSender.send(message);
+            StringBuilder emailText = buildEmailText(name, vorschlaege);
+            sendEmail(fromEmail, to, emailText.toString());
         } catch (Exception exception) {
             throw new EMailSend(exception);
         }
+    }
+
+    private void sendEmail(String from, String to, String text) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setSubject(EmailSenderService.YOUR_AUTOMATIC_RECIPE_SUGGESTIONS);
+        message.setFrom(from);
+        message.setTo(to);
+        message.setText(text);
+        emailSender.send(message);
     }
 
     @Override
@@ -112,13 +109,33 @@ public class EmailSenderService implements SendEmailUseCase {
     }
 
     @Override
-    public void sendMessageUsingThymeleafTemplate(String to, String subject, Map<String, Object> templateModel) throws IOException, MessagingException {
+    public void sendMessageUsingThymeleafTemplate(String to, String subject, Map<String, Object> templateModel)  {
         //Implement this method
 
     }
 
     @Override
-    public void sendMessageUsingFreemarkerTemplate(String to, String subject, Map<String, Object> templateModel) throws IOException, MessagingException {
+    public void sendMessageUsingFreemarkerTemplate(String to, String subject, Map<String, Object> templateModel)  {
         //Implement this method
+    }
+
+    private void setSchedule(AutomatischeVorschlaegeUseCase automatischeVorschlaegeUseCase) {
+        scheduledDays = automatischeVorschlaegeUseCase.getScheduledDays();
+        scheduledTime = automatischeVorschlaegeUseCase.getScheduledTime();
+
+        LocalDateTime now = LocalDateTime.now();
+        currentDay = now.getDayOfWeek();
+        currentTime = now.toLocalTime();
+
+        log.info("Current day: {}", currentDay);
+        log.info("Current time: {}", currentTime);
+    }
+
+    private static boolean isAutomaticSuggestionsActivated(AutomatischeVorschlaegeUseCase automatischeVorschlaegeUseCase) {
+        return automatischeVorschlaegeUseCase.isAutomaticSuggestionsActivated();
+    }
+
+    private boolean dueDateReached() {
+        return scheduledDays.contains(currentDay) && currentTime.isAfter(scheduledTime);
     }
 }

@@ -20,32 +20,69 @@ public class UserService implements CreateUserUseCase {
 
     @Override
     public User saveUser(User user) throws EMailSend {
-        if (Boolean.TRUE.equals(existsByMail(user))) {
-            throw new UserAlreadyExists("Email already exists");
-        }
+        validateUserDoesNotExist(user);
 
         user.setEnabled(false);
+        saveUserAndCreateConfirmation(user);
+        sendConfirmationEmail(user);
+
+        return user;
+    }
+
+    @Override
+    public Boolean verifyToken(String token) {
+        Confirmation confirmation = findConfirmationByToken(token);
+        User user = enableUserAndSave(confirmation);
+        userRepository.save(user);
+        deleteConfirmation(confirmation);
+
+        return Boolean.TRUE;
+    }
+
+    private void validateUserDoesNotExist(User user) {
+        if (existsByMail(user).equals(true)) {
+            throw new UserAlreadyExists("Email already exists");
+        }
+    }
+
+    private void saveUserAndCreateConfirmation(User user) {
         userRepository.save(user);
 
         Confirmation confirmation = new Confirmation(user);
         confirmationRepository.save(confirmation);
+    }
 
-        emailService.sendSimpleMessage(user.getName(), user.getEmail(), confirmation.getToken());
+    private void sendConfirmationEmail(User user) throws EMailSend {
+        emailService.sendSimpleMessage(user.getName(), user.getEmail(), generateConfirmationToken(user));
+    }
 
-        return user;
+    private String generateConfirmationToken(User user) {
+        return confirmationRepository.findByUser(user).getToken();
     }
 
     private Boolean existsByMail(User user) {
         return userRepository.existsByEmail(user.getEmail());
     }
 
-    @Override
-    public Boolean verifyToken(String token) {
-        Confirmation confirmation = confirmationRepository.findByToken(token);
-        User user = userRepository.findByEmailIgnoreCase(confirmation.getUser().getEmail());
-        user.setEnabled(true);
-        userRepository.save(user);
-        confirmationRepository.delete(confirmation);
-        return Boolean.TRUE;
+    private Confirmation findConfirmationByToken(String token) {
+        if (confirmationRepository.findByToken(token) == null) {
+            throw new IllegalArgumentException("Token not found");
+        }
+        return confirmationRepository.findByToken(token);
     }
+
+    private User enableUserAndSave(Confirmation confirmation) {
+        User user = findUserByEmail(confirmation.getUser().getEmail());
+        user.setEnabled(true);
+        return userRepository.save(user);
+    }
+
+    private User findUserByEmail(String email) {
+        return userRepository.findByEmailIgnoreCase(email);
+    }
+
+    private void deleteConfirmation(Confirmation confirmation) {
+        confirmationRepository.delete(confirmation);
+    }
+
 }

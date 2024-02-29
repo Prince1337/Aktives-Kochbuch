@@ -10,6 +10,5 @@ import java.util.Optional;
 @Repository
 @RepositoryRestResource(collectionResourceRel = "rezepte", path = "rezepte")
 public interface RezeptRepository extends JpaRepository<Rezept, Long>{
-
     Optional<Rezept> findByTitel(String title);
 }

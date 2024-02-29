@@ -1,5 +1,6 @@
 package prince.aktiveskochbuch.adapter.apis;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -12,6 +13,8 @@ import prince.aktiveskochbuch.domain.dtos.HttpResponse;
 import prince.aktiveskochbuch.domain.dtos.VorschlaegeDto;
 import prince.aktiveskochbuch.domain.models.Rezept;
 import prince.aktiveskochbuch.domain.models.VegetarischesRezept;
+import prince.aktiveskochbuch.domain.usecases.AutomatischeVorschlaegeUseCase;
+import prince.aktiveskochbuch.domain.usecases.SendEmailUseCase;
 import prince.aktiveskochbuch.domain.usecases.VorschlaegeGenerierenUseCase;
 
 import java.util.List;
@@ -26,16 +29,27 @@ class VorschlaegeControllerTest {
     @Mock
     private VorschlaegeGenerierenUseCase vorschlaegeGenerierenUseCase;
 
+    @Mock
+    private SendEmailUseCase sendEmailUseCase;
+
+    @Mock
+    private AutomatischeVorschlaegeUseCase automatischeVorschlaegeUseCase;
+
     @InjectMocks
     private VorschlaegeController vorschlaegeController;
+
+    @BeforeEach
+    void setUp() {
+        vorschlaegeController = new VorschlaegeController(vorschlaegeGenerierenUseCase, sendEmailUseCase, automatischeVorschlaegeUseCase);
+    }
 
     @Test
     void testGenerateVorschlaege() throws EMailSend {
         VorschlaegeDto vorschlaegeDto = new VorschlaegeDto(List.of("Gesund", "Gemüse"), 3);
+
         List<Rezept> expectedVorschlaege = List.of(new VegetarischesRezept("Vegetarische Lasagne", "Lasagneplatten, Tomatensauce, Gemüse, Bechamelsauce, Käse", List.of("Gesund", "Käse")),
                 new VegetarischesRezept("Vegetarische Pizza", "Pizzateig, Tomatensauce, Gemüse, Käse", List.of("Gesund", "Gemüse")));
         when(vorschlaegeGenerierenUseCase.generateVorschlaege(vorschlaegeDto)).thenReturn(expectedVorschlaege);
-
         ResponseEntity<HttpResponse> result = vorschlaegeController.generateAutomaticVorschlaege(vorschlaegeDto);
 
         assertEquals(HttpStatus.OK, result.getStatusCode(), "Status code should be 200");

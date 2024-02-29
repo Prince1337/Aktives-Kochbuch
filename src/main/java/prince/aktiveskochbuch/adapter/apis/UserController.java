@@ -8,9 +8,7 @@ import prince.aktiveskochbuch.application.exceptions.EMailSend;
 import prince.aktiveskochbuch.domain.dtos.HttpResponse;
 import prince.aktiveskochbuch.domain.models.User;
 import prince.aktiveskochbuch.domain.usecases.CreateUserUseCase;
-import prince.aktiveskochbuch.domain.usecases.SendEmailUseCase;
 
-import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -20,26 +18,22 @@ import java.util.Map;
 public class UserController {
 
     private final CreateUserUseCase createUserUseCase;
-    private final SendEmailUseCase sendEmailUseCase;
 
     @PostMapping
     public ResponseEntity<HttpResponse> createUser(@RequestBody User user) throws EMailSend {
         User newUser = createUserUseCase.saveUser(user);
 
-        return ResponseEntity.created(URI.create("")).body(
-                HttpResponse.builder()
-                        .timeStamp(LocalDateTime.now())
-                        .data(Map.of("user", newUser))
-                        .message("User created")
-                        .status(HttpStatus.CREATED)
-                        .statusCode(HttpStatus.CREATED.value())
-                        .build()
-        );
+        return getHttpResponseCreateEntity(newUser);
     }
 
     @GetMapping
     public ResponseEntity<HttpResponse> confirmUserAccount(@RequestParam("token") String token) {
         Boolean isSuccess = createUserUseCase.verifyToken(token);
+
+        return getHttpResponseConfirmEntity(isSuccess);
+    }
+
+    private static ResponseEntity<HttpResponse> getHttpResponseConfirmEntity(Boolean isSuccess) {
         return ResponseEntity.ok().body(
                 HttpResponse.builder()
                         .timeStamp(LocalDateTime.now())
@@ -47,6 +41,18 @@ public class UserController {
                         .message("Account Verified")
                         .status(HttpStatus.OK)
                         .statusCode(HttpStatus.OK.value())
+                        .build()
+        );
+    }
+
+    private static ResponseEntity<HttpResponse> getHttpResponseCreateEntity(User newUser) {
+        return ResponseEntity.ok(
+                HttpResponse.builder()
+                        .timeStamp(LocalDateTime.now())
+                        .data(Map.of("user", newUser))
+                        .message("User created")
+                        .status(HttpStatus.CREATED)
+                        .statusCode(HttpStatus.CREATED.value())
                         .build()
         );
     }

@@ -1,6 +1,7 @@
 package prince.aktiveskochbuch.application.exceptions;
 
-public class EMailSend extends Throwable {
+@SuppressWarnings("PMD.MissingSerialVersionUID")
+public class EMailSend extends RuntimeException {
     public EMailSend(Exception exception) {
         super(exception);
     }
