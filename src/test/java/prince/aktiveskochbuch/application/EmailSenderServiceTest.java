@@ -11,6 +11,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import prince.aktiveskochbuch.adapter.db.UserRepository;
 import prince.aktiveskochbuch.application.exceptions.EMailSend;
 import prince.aktiveskochbuch.domain.models.Rezept;
+import prince.aktiveskochbuch.domain.models.Role;
 import prince.aktiveskochbuch.domain.models.StandardRezept;
 import prince.aktiveskochbuch.domain.models.User;
 import prince.aktiveskochbuch.domain.usecases.AutomatischeVorschlaegeUseCase;
@@ -73,7 +74,7 @@ class EmailSenderServiceTest {
         when(automatischeVorschlaegeUseCase.getScheduledDays()).thenReturn(Collections.singleton(LocalDateTime.now().getDayOfWeek()));
         when(automatischeVorschlaegeUseCase.getScheduledTime()).thenReturn(LocalTime.now().minusMinutes(1));
 
-        User user = new User(1L, "John Doe", "john@example.com", "password", false);
+        User user = new User(1L, "name", "email", "password", true, Role.USER, Collections.emptyList());
         when(userRepository.findByEmailIgnoreCase(null)).thenReturn(user);
 
         List<Rezept> vorschlaege = Collections.singletonList(new StandardRezept("Recipe", "Description", Collections.emptyList()));
